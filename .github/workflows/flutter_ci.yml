@@ -34,15 +34,37 @@ jobs:
             (cd "$dir" && flutter pub get)
           done
 
-      - name: Run tests (packages)
+      - name: Run tests with coverage (packages)
         run: |
           set -e
-          (cd packages/domain && flutter test)
-          (cd packages/data && flutter test)
-          (cd packages/application && flutter test)
+          (cd packages/domain && flutter test --coverage)
+          (cd packages/data && flutter test --coverage)
+          (cd packages/application && flutter test --coverage)
 
-      - name: Run tests (app)
-        run: flutter test
+      - name: Run tests with coverage (app)
+        run: flutter test --coverage
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-artifacts
+          path: |
+            coverage/lcov.info
+            packages/domain/coverage/lcov.info
+            packages/data/coverage/lcov.info
+            packages/application/coverage/lcov.info
+
+      - name: Upload to Codecov (optional)
+        if: ${{ secrets.CODECOV_TOKEN != '' }}
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: |
+            coverage/lcov.info
+            packages/domain/coverage/lcov.info
+            packages/data/coverage/lcov.info
+            packages/application/coverage/lcov.info
+          fail_ci_if_error: false
 
       - name: Analyze (packages + app lib)
         run: |

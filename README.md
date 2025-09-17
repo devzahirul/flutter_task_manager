@@ -1,6 +1,7 @@
 # Flutter Task Manager
 
 [![Flutter CI](https://github.com/devzahirul/flutter_task_manager/actions/workflows/flutter_ci.yml/badge.svg)](https://github.com/devzahirul/flutter_task_manager/actions/workflows/flutter_ci.yml)
+ [![codecov](https://codecov.io/gh/devzahirul/flutter_task_manager/branch/main/graph/badge.svg)](https://codecov.io/gh/devzahirul/flutter_task_manager)
 
 Modular, test‑driven Flutter app using a Clean Architecture split into local packages:
 
@@ -81,6 +82,13 @@ Only needed if using `FirebaseAuthRepository` and/or `FirestoreTasksRepository`.
 ## Build
 
 - Web: `flutter build web --release` → outputs to `build/web`
+
+## Coverage
+
+- CI generates coverage for app and all packages and uploads as an artifact.
+- Optional Codecov upload is enabled when `CODECOV_TOKEN` is set as a repo secret.
+  - Create a Codecov account and add this repo.
+  - Add GitHub secret `CODECOV_TOKEN` (from Codecov) to enable uploads.
 
 ## Tests (TDD)
 
