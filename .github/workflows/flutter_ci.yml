@@ -1,0 +1,51 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter pub get (root)
+        run: flutter pub get
+
+      - name: Flutter pub get (packages)
+        run: |
+          for dir in packages/domain packages/data packages/application; do
+            echo "Fetching in $dir"
+            (cd "$dir" && flutter pub get)
+          done
+
+      - name: Run tests (packages)
+        run: |
+          set -e
+          (cd packages/domain && flutter test)
+          (cd packages/data && flutter test)
+          (cd packages/application && flutter test)
+
+      - name: Run tests (app)
+        run: flutter test
+
+      - name: Build web (release)
+        run: flutter build web --release
+
+      - name: Upload web build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: build/web
+
