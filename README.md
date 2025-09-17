@@ -86,7 +86,7 @@ Only needed if using `FirebaseAuthRepository` and/or `FirestoreTasksRepository`.
   - Create a Codecov account and add this repo.
   - Add GitHub secret `CODECOV_TOKEN` (from Codecov) to enable uploads.
 
-<!-- ci: trigger -->
+<!-- ci: trigger 2 -->
 
 ## Tests (TDD)
 
