@@ -102,7 +102,7 @@ jobs:
             packages/application/coverage/lcov.info
 
       - name: Upload to Codecov (optional, stable only)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.channel == 'stable'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.channel == 'stable' && env.CODECOV_TOKEN != ''
         uses: codecov/codecov-action@v4
         with:
           token: ${{ env.CODECOV_TOKEN }}
