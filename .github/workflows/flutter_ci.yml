@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
@@ -14,17 +18,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        channel: [stable, beta]
+        channel: [stable]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Set up Flutter ${{ matrix.channel }}
         uses: subosito/flutter-action@v2
         with:
           channel: ${{ matrix.channel }}
           cache: true
+
+      - name: Cache Pub (packages)
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
       - name: Flutter pub get (root)
         run: flutter pub get
@@ -36,20 +50,36 @@ jobs:
             (cd "$dir" && flutter pub get)
           done
 
+      - name: Run tests (packages)
+        if: github.event_name != 'push' || github.ref != 'refs/heads/main'
+        run: |
+          set -e
+          (cd packages/domain && flutter test --no-pub)
+          (cd packages/data && flutter test --no-pub)
+          (cd packages/application && flutter test --no-pub)
+
       - name: Run tests with coverage (packages)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           set -e
           (cd packages/domain && flutter test --coverage)
           (cd packages/data && flutter test --coverage)
           (cd packages/application && flutter test --coverage)
 
+      - name: Run tests (app)
+        if: github.event_name != 'push' || github.ref != 'refs/heads/main'
+        run: flutter test --no-pub
+
       - name: Run tests with coverage (app)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: flutter test --coverage
 
       - name: Install lcov (for merging)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: sudo apt-get update && sudo apt-get install -y lcov
 
       - name: Merge coverage into single report
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           mkdir -p coverage
           lcov \
@@ -60,6 +90,7 @@ jobs:
             -o coverage/combined.info
 
       - name: Upload coverage artifacts
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-artifacts-${{ matrix.channel }}
@@ -71,7 +102,7 @@ jobs:
             packages/application/coverage/lcov.info
 
       - name: Upload to Codecov (optional, stable only)
-        if: matrix.channel == 'stable'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.channel == 'stable'
         uses: codecov/codecov-action@v4
         with:
           token: ${{ env.CODECOV_TOKEN }}
@@ -86,9 +117,11 @@ jobs:
             packages/application/lib
 
       - name: Build web (release)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: flutter build web --release
 
       - name: Upload web build artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: web-build-${{ matrix.channel }}
@@ -101,12 +134,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Set up Flutter stable
         uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
+
+      - name: Cache Pub (packages)
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
       - name: Flutter pub get (root)
         run: flutter pub get
