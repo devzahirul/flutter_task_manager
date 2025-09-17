@@ -85,8 +85,8 @@ Only needed if using `FirebaseAuthRepository` and/or `FirestoreTasksRepository`.
 
 ## Coverage
 
-- CI generates coverage for app and all packages and uploads as an artifact.
-- Optional Codecov upload is enabled when `CODECOV_TOKEN` is set as a repo secret.
+- CI generates coverage for app and all packages, merges them into `coverage/combined.info`, and uploads artifacts.
+- Optional Codecov upload (using the merged report) is enabled when `CODECOV_TOKEN` is set as a repo secret.
   - Create a Codecov account and add this repo.
   - Add GitHub secret `CODECOV_TOKEN` (from Codecov) to enable uploads.
 

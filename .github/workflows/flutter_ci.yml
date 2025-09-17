@@ -44,12 +44,26 @@ jobs:
       - name: Run tests with coverage (app)
         run: flutter test --coverage
 
+      - name: Install lcov (for merging)
+        run: sudo apt-get update && sudo apt-get install -y lcov
+
+      - name: Merge coverage into single report
+        run: |
+          mkdir -p coverage
+          lcov \
+            -a coverage/lcov.info \
+            -a packages/domain/coverage/lcov.info \
+            -a packages/data/coverage/lcov.info \
+            -a packages/application/coverage/lcov.info \
+            -o coverage/combined.info
+
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4
         with:
           name: coverage-artifacts
           path: |
             coverage/lcov.info
+            coverage/combined.info
             packages/domain/coverage/lcov.info
             packages/data/coverage/lcov.info
             packages/application/coverage/lcov.info
@@ -59,11 +73,7 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: |
-            coverage/lcov.info
-            packages/domain/coverage/lcov.info
-            packages/data/coverage/lcov.info
-            packages/application/coverage/lcov.info
+          files: coverage/combined.info
           fail_ci_if_error: false
 
       - name: Analyze (packages + app lib)
