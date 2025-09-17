@@ -12,6 +12,40 @@ Modular, test‑driven Flutter app using a Clean Architecture split into local p
 
 The default runtime uses in‑memory repositories for both Auth and Tasks so you can run immediately without Firebase.
 
+## Design System (Android‑first, Material 3)
+
+This repo includes a reusable design system package focused on Android Material 3.
+
+- Tokens: colors, spacing, radii, elevations, durations, opacities
+- Theme: `DSThemeBuilder.light()/dark()` and `fromScheme(...)` for dynamic color
+- Components: `DSButton`, `DSInput`, `DSCard` with cohesive component themes
+
+Quick start:
+
+```
+import 'package:design_system/design_system.dart';
+
+MaterialApp(
+  theme: DSThemeBuilder.light(),
+  darkTheme: DSThemeBuilder.dark(),
+  themeMode: ThemeMode.system,
+);
+```
+
+Dynamic color (Android 12+), using `fromScheme`:
+
+```
+final light = ColorScheme.fromSeed(seedColor: DSColors.light.brand);
+final dark = ColorScheme.fromSeed(seedColor: DSColors.dark.brand, brightness: Brightness.dark);
+MaterialApp(
+  theme: DSThemeBuilder.fromScheme(light),
+  darkTheme: DSThemeBuilder.fromScheme(dark, dark: true),
+  themeMode: ThemeMode.system,
+);
+```
+
+See full docs and examples: `packages/design_system/README.md`
+
 ## Quick Start
 
 - Requirements
