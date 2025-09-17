@@ -9,15 +9,19 @@ on:
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        channel: [stable, beta]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Flutter
+      - name: Set up Flutter ${{ matrix.channel }}
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          channel: ${{ matrix.channel }}
           cache: true
 
       - name: Flutter pub get (root)
@@ -40,9 +44,12 @@ jobs:
       - name: Run tests (app)
         run: flutter test
 
-      - name: Analyze (root)
-        run: flutter analyze
-        continue-on-error: true
+      - name: Analyze (packages + app lib)
+        run: |
+          flutter analyze lib \
+            packages/domain/lib \
+            packages/data/lib \
+            packages/application/lib
 
       - name: Build web (release)
         run: flutter build web --release
