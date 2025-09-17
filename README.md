@@ -1,5 +1,7 @@
 # Flutter Task Manager
 
+[![Flutter CI](https://github.com/devzahirul/flutter_task_manager/actions/workflows/flutter_ci.yml/badge.svg)](https://github.com/devzahirul/flutter_task_manager/actions/workflows/flutter_ci.yml)
+
 Modular, test‑driven Flutter app using a Clean Architecture split into local packages:
 
 - `packages/domain` — pure Dart entities and repository interfaces
