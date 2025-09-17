@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:domain/domain.dart';
+import '../models/user_dto.dart';
 
 class FirebaseAuthRepository implements AuthRepository {
   FirebaseAuthRepository({fb.FirebaseAuth? auth})
@@ -7,27 +8,31 @@ class FirebaseAuthRepository implements AuthRepository {
 
   final fb.FirebaseAuth _auth;
 
-  AppUser? _map(fb.User? user) => user == null
+  UserDto? _toDto(fb.User? user) => user == null
       ? null
-      : AppUser(
+      : UserDto(
           id: user.uid,
           email: user.email,
           displayName: user.displayName,
         );
 
-  @override
-  Stream<AppUser?> authStateChanges() => _auth.authStateChanges().map(_map);
+  AppUser? _toDomain(UserDto? dto) => dto == null
+      ? null
+      : AppUser(id: dto.id, email: dto.email, displayName: dto.displayName);
 
   @override
-  Future<AppUser?> currentUser() async => _map(_auth.currentUser);
+  Stream<AppUser?> authStateChanges() =>
+      _auth.authStateChanges().map(_toDto).map(_toDomain);
+
+  @override
+  Future<AppUser?> currentUser() async => _toDomain(_toDto(_auth.currentUser));
 
   @override
   Future<AppUser?> signInAnonymously() async {
     final cred = await _auth.signInAnonymously();
-    return _map(cred.user);
+    return _toDomain(_toDto(cred.user));
   }
 
   @override
   Future<void> signOut() => _auth.signOut();
 }
-

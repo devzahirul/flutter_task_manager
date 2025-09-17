@@ -1,25 +1,26 @@
 import 'dart:async';
 
 import 'package:domain/domain.dart';
+import '../models/user_dto.dart';
 
 class InMemoryAuthRepository implements AuthRepository {
   InMemoryAuthRepository();
 
-  final _controller = StreamController<AppUser?>.broadcast();
-  AppUser? _current;
+  final _controller = StreamController<UserDto?>.broadcast();
+  UserDto? _current;
   int _anonCounter = 0;
 
   @override
-  Stream<AppUser?> authStateChanges() => _controller.stream;
+  Stream<AppUser?> authStateChanges() => _controller.stream.map(_toDomain);
 
   @override
-  Future<AppUser?> currentUser() async => _current;
+  Future<AppUser?> currentUser() async => _toDomain(_current);
 
   @override
   Future<AppUser?> signInAnonymously() async {
-    _current = AppUser(id: 'anon-${++_anonCounter}');
+    _current = UserDto(id: 'anon-${++_anonCounter}');
     _controller.add(_current);
-    return _current;
+    return _toDomain(_current);
   }
 
   @override
@@ -31,4 +32,7 @@ class InMemoryAuthRepository implements AuthRepository {
   void dispose() {
     _controller.close();
   }
+  AppUser? _toDomain(UserDto? dto) => dto == null
+      ? null
+      : AppUser(id: dto.id, email: dto.email, displayName: dto.displayName);
 }
