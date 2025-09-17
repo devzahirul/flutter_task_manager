@@ -3,14 +3,15 @@ import 'dart:async';
 import 'package:domain/domain.dart';
 
 class InMemoryTasksRepository implements TasksRepository {
-  final _controller = StreamController<List<Task>>.broadcast();
+  late final StreamController<List<Task>> _controller;
   final List<Task> _tasks = [];
   int _idCounter = 0;
 
   InMemoryTasksRepository() {
-    // seed initial empty list to watchers
-    // Delay to ensure listeners can attach
-    Future<void>.microtask(() => _controller.add(List.unmodifiable(_tasks)));
+    // Emit the current list to each new listener immediately
+    _controller = StreamController<List<Task>>.broadcast(
+      onListen: () => _controller.add(List.unmodifiable(_tasks)),
+    );
   }
 
   void _emit() {
@@ -55,4 +56,3 @@ class InMemoryTasksRepository implements TasksRepository {
     _controller.close();
   }
 }
-
