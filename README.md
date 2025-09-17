@@ -52,19 +52,15 @@ The default runtime uses in‑memory repositories for both Auth and Tasks so you
 
 Runtime provider overrides live in `lib/main.dart`:
 
-- Current defaults (in‑memory for both):
-  - `authRepositoryProvider.overrideWithValue(InMemoryAuthRepository())`
-  - `tasksRepositoryProvider.overrideWithValue(InMemoryTasksRepository())`
+- Defaults to in‑memory for both Auth and Tasks.
+- You can switch at runtime using `--dart-define` flags (no code edits):
+  - Firebase Auth: `--dart-define=USE_FIREBASE_AUTH=true`
+  - Firestore Tasks: `--dart-define=USE_FIRESTORE_TASKS=true`
+  - Example: `flutter run -d chrome \
+      --dart-define=USE_FIREBASE_AUTH=true \
+      --dart-define=USE_FIRESTORE_TASKS=true`
 
-- Switch to Firebase Auth:
-  - Replace the auth override with `FirebaseAuthRepository()` (after configuring Firebase):
-    - `authRepositoryProvider.overrideWithProvider(Provider((ref) => FirebaseAuthRepository()))`
-
-- Switch to Firestore Tasks:
-  - Replace tasks override with:
-    - `tasksRepositoryProvider.overrideWithValue(FirestoreTasksRepository())`
-
-Bootstrap supports passing `overrides:` directly: see `lib/bootstrap.dart`.
+Under the hood, `lib/config/runtime.dart` reads the flags and `lib/main.dart` sets provider overrides accordingly.
 
 ## Firebase Setup (optional)
 
