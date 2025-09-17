@@ -62,7 +62,7 @@ jobs:
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-artifacts
+          name: coverage-artifacts-${{ matrix.channel }}
           path: |
             coverage/lcov.info
             coverage/combined.info
@@ -91,7 +91,7 @@ jobs:
       - name: Upload web build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: web-build
+          name: web-build-${{ matrix.channel }}
           path: build/web
 
   analyze-tests:
