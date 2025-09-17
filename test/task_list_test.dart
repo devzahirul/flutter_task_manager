@@ -39,4 +39,35 @@ void main() {
     // Still present, now checked (no visual assert, just no crash)
     expect(find.byType(CheckboxListTile), findsOneWidget);
   });
+
+  testWidgets('add task by title and delete it', (tester) async {
+    final tasksRepo = InMemoryTasksRepository();
+    final authRepo = InMemoryAuthRepository();
+    await authRepo.signInAnonymously();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          tasksRepositoryProvider.overrideWithValue(tasksRepo),
+          authRepositoryProvider.overrideWithValue(authRepo),
+        ],
+        child: const MaterialApp(home: HomePage()),
+      ),
+    );
+
+    await tester.pump();
+
+    // Type a title and add
+    await tester.enterText(find.byKey(const Key('task_input')), 'Test A');
+    await tester.tap(find.byKey(const Key('add_task_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Test A'), findsOneWidget);
+
+    // Delete the task (first id should be 1 in memory repo)
+    await tester.tap(find.byKey(const Key('delete_task_1')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Test A'), findsNothing);
+  });
 }

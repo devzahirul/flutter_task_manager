@@ -2,11 +2,24 @@ import 'package:application/application.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  final _textCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _textCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(authControllerProvider);
     final controller = ref.read(authControllerProvider.notifier);
     final tasks = ref.watch(tasksControllerProvider);
@@ -52,9 +65,32 @@ class HomePage extends ConsumerWidget {
                         children: [
                           const Text('No tasks'),
                           const SizedBox(height: 12),
+                          SizedBox(
+                            width: 320,
+                            child: TextField(
+                              key: const Key('task_input'),
+                              controller: _textCtrl,
+                              decoration: const InputDecoration(
+                                labelText: 'Task title',
+                                border: OutlineInputBorder(),
+                              ),
+                              onSubmitted: (_) async {
+                                final title = _textCtrl.text.trim();
+                                await tasksCtrl.addTask(
+                                  title.isEmpty ? 'Task 1' : title,
+                                );
+                                _textCtrl.clear();
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 8),
                           ElevatedButton(
                             key: const Key('add_task_button'),
-                            onPressed: () => tasksCtrl.addTask('Task ${DateTime.now().millisecondsSinceEpoch}'),
+                            onPressed: () async {
+                              final title = _textCtrl.text.trim();
+                              await tasksCtrl.addTask(title.isEmpty ? 'Task 1' : title);
+                              _textCtrl.clear();
+                            },
                             child: const Text('Add task'),
                           ),
                         ],
@@ -63,6 +99,25 @@ class HomePage extends ConsumerWidget {
                     return Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        SizedBox(
+                          width: 320,
+                          child: TextField(
+                            key: const Key('task_input'),
+                            controller: _textCtrl,
+                            decoration: const InputDecoration(
+                              labelText: 'Task title',
+                              border: OutlineInputBorder(),
+                            ),
+                            onSubmitted: (_) async {
+                              final title = _textCtrl.text.trim();
+                              await tasksCtrl.addTask(
+                                title.isEmpty ? 'Task ${items.length + 1}' : title,
+                              );
+                              _textCtrl.clear();
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 12),
                         SizedBox(
                           height: 300,
                           width: 350,
@@ -73,6 +128,11 @@ class HomePage extends ConsumerWidget {
                                   value: t.isDone,
                                   title: Text(t.title),
                                   onChanged: (_) => tasksCtrl.toggleDone(t),
+                                  secondary: IconButton(
+                                    key: Key('delete_task_${t.id}'),
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () => tasksCtrl.deleteTask(t.id),
+                                  ),
                                 ),
                             ],
                           ),
@@ -80,7 +140,13 @@ class HomePage extends ConsumerWidget {
                         const SizedBox(height: 12),
                         ElevatedButton(
                           key: const Key('add_task_button'),
-                          onPressed: () => tasksCtrl.addTask('Task ${items.length + 1}'),
+                          onPressed: () async {
+                            final title = _textCtrl.text.trim();
+                            await tasksCtrl.addTask(
+                              title.isEmpty ? 'Task ${items.length + 1}' : title,
+                            );
+                            _textCtrl.clear();
+                          },
                           child: const Text('Add task'),
                         ),
                       ],
