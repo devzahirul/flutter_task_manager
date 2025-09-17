@@ -1,6 +1,6 @@
 # Flutter Task Manager
 
-[![Flutter CI](https://github.com/devzahirul/flutter_task_manager/actions/workflows/flutter_ci.yml/badge.svg)](https://github.com/devzahirul/flutter_task_manager/actions/workflows/flutter_ci.yml)
+[![Flutter CI](https://github.com/devzahirul/flutter_task_manager/actions/workflows/flutter_ci.yml/badge.svg?branch=main)](https://github.com/devzahirul/flutter_task_manager/actions/workflows/flutter_ci.yml?query=branch%3Amain)
  [![codecov](https://codecov.io/gh/devzahirul/flutter_task_manager/branch/main/graph/badge.svg)](https://codecov.io/gh/devzahirul/flutter_task_manager)
 
 Modular, test‑driven Flutter app using a Clean Architecture split into local packages:
