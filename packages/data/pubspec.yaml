@@ -1,0 +1,21 @@
+name: data
+description: Data layer for flutter_task_manager
+version: 0.1.0
+publish_to: 'none'
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  domain:
+    path: ../domain
+  firebase_auth: ^5.3.0
+  cloud_firestore: ^5.4.4
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.3
