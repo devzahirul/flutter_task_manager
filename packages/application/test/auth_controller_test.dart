@@ -48,6 +48,8 @@ void main() {
     addTearDown(container.dispose);
 
     // Give time for async initialization
+    // Force provider creation, then allow microtask turn
+    container.read(authControllerProvider);
     await Future<void>.delayed(Duration.zero);
 
     final state = container.read(authControllerProvider);
@@ -96,4 +98,3 @@ void main() {
     expect(s.value, isNull);
   });
 }
-
