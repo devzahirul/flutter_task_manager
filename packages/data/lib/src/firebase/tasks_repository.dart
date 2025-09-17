@@ -88,3 +88,4 @@ class FirestoreTasksRepository implements TasksRepository {
     await _col.doc(id).delete();
   }
 }
+

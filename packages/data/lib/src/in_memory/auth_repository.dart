@@ -32,7 +32,9 @@ class InMemoryAuthRepository implements AuthRepository {
   void dispose() {
     _controller.close();
   }
+
   AppUser? _toDomain(UserDto? dto) => dto == null
       ? null
       : AppUser(id: dto.id, email: dto.email, displayName: dto.displayName);
 }
+

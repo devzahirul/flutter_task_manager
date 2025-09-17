@@ -9,7 +9,6 @@ class InMemoryTasksRepository implements TasksRepository {
   int _idCounter = 0;
 
   InMemoryTasksRepository() {
-    // Emit the current list to each new listener immediately
     _controller = StreamController<List<TaskDto>>.broadcast(
       onListen: () => _controller.add(List.unmodifiable(_tasks)),
     );
@@ -56,6 +55,7 @@ class InMemoryTasksRepository implements TasksRepository {
   void dispose() {
     _controller.close();
   }
+
   Task _toDomain(TaskDto dto) => Task(
         id: dto.id,
         title: dto.title,
@@ -69,5 +69,5 @@ class InMemoryTasksRepository implements TasksRepository {
         isDone: task.isDone,
         createdAt: task.createdAt,
       );
-
 }
+
